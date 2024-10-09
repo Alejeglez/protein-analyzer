@@ -24,7 +24,6 @@ def read_fasta_files():
                     files_processed.append(file)
                     description = seq_record.description
                     
-                    # Usamos una expresión regular para encontrar el texto dentro de paréntesis
                     match = re.search(r'\((.*?)\)', description)
                     
                     if match:
@@ -41,16 +40,13 @@ def generate_kmers(sequence, k):
     return [sequence[i:i+k] for i in range(len(sequence) - k + 1)]
 
 
-def tfidf_method(sequences, normalize=False):
+def tfidf_method(sequences):
 
     tfidf_vectorizer = TfidfVectorizer()
 
     tfidf_matrix = tfidf_vectorizer.fit_transform(sequences)
 
     df_tfidf = pd.DataFrame(tfidf_matrix.toarray(), columns=tfidf_vectorizer.get_feature_names_out())
-    
-    if normalize:
-        df_tfidf = np.log1p(df_tfidf)
 
     for column in df_tfidf.columns:
         max_value = df_tfidf[column].max()
@@ -96,5 +92,5 @@ if __name__ == "__main__":
     k = 3 
     kmers = [generate_kmers(seq, k) for seq in sequences]
     sequences = [' '.join(kmer) for kmer in kmers]
-    tfidf_matrix = tfidf_method(sequences, normalize=True)
+    tfidf_matrix = tfidf_method(sequences)
     cosine_similarity_method(tfidf_matrix, files_processed)
